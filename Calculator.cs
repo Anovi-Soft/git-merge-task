@@ -6,25 +6,21 @@ namespace Kontur.Courses.Git
 
 		public Maybe<double> Calculate(string[] args)
 		{
-			if (args.Length == 0)
-				return lastResult;
-			if (args.Length == 1)
-				return lastResult = double.Parse(args[0]);
-			if (args.Length == 2)
+			switch (args.Length)
 			{
-				// Если не хватает первого аргумента, то использовать lastResult
-				// Должно работать так:
-				// 2 + 2
-				//> 4
-				// + 1
-				//>5
-				return lastResult = Maybe<double>.FromError("Not implemented yet");
-			}
-			if (args.Length == 3)
-			{
-				var v1 = double.Parse(args[0]);
-				var v2 = double.Parse(args[2]);
-				return lastResult = Execute(args[1], v1, v2);
+				case 0:
+					return lastResult;
+				case 1:
+					return lastResult = double.Parse(args[0]);
+				case 2:
+					if (!lastResult.HasValue)
+						return lastResult = Maybe<double>.FromError("Last result is abcent");
+					var v = double.Parse(args[1]);
+					return lastResult = Execute(args[0], lastResult.Value, v);
+				case 3:
+					var v1 = double.Parse(args[0]);
+					var v2 = double.Parse(args[2]);
+					return lastResult = Execute(args[1], v1, v2);
 			}
 			return Maybe<double>.FromError("Error input");
 		}
@@ -36,7 +32,7 @@ namespace Kontur.Courses.Git
 			if (op == "-")
 				return v1 - v2;
 			if (op == "*")
-				return v1 - v2;
+				return v1 * v2;
 			if (op == "/")
 				return v1 / v2;
 			return Maybe<double>.FromError("Unknown operation '{0}'", op);
